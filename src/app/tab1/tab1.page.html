@@ -48,8 +48,11 @@
     </div>
   </div>
   <div *ngIf="account.language === 'non'" style="display: flex; justify-content: center;">
-    <ion-button style="width: 150px; height: 150px;">
+    <ion-button style="width: 150px; height: 150px;" *ngIf="!transferTx">
       <ion-icon name="camera-outline" style="width: 150px; height: 150px;"></ion-icon>
+    </ion-button>
+    <ion-button style="width: 150px; height: 150px;" (click)="(payXym())" *ngIf="transferTx">
+      <ion-icon name="send-outline" style="width: 150px; height: 150px;"></ion-icon>
     </ion-button>
   </div>
 </ion-content>
