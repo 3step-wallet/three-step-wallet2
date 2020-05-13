@@ -2,12 +2,12 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button (click)="dismissModalController()">
-        <ion-icon name="close" slot="icon-only" ></ion-icon>
+        <ion-icon name="close" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-title>アカウント設定</ion-title>
     <ion-buttons slot="end">
-      <ion-button [disabled]="!f.form.valid" (click)="saveAccount()">
+      <ion-button (click)="saveAccount()">
         登録
       </ion-button>
     </ion-buttons>
@@ -15,34 +15,49 @@
 </ion-header>
 
 <ion-content>
-  <form #f="ngForm" class="ion-padding">
-    <ion-list ion-no-padding>
-      <ion-item>
-        <ion-label position="floating">マルチシグアカウント公開鍵</ion-label>
-        <ion-input type="text" [(ngModel)]="account.multisigPublicKey" required name="multisigPublicKey"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">依頼者アカウント秘密鍵</ion-label>
-        <ion-input type="text" [(ngModel)]="account.initiatorPrivateKey" required name="initiatorPrivateKey"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">承認者電話番号</ion-label>
-        <ion-input type="tel" [(ngModel)]="account.parentTel" required name="tel"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label>連絡方法</ion-label>
-        <ion-select [value]="account.contact" (ionChange)="onCallChange($event)">
-          <ion-select-option value="tel">電話</ion-select-option>
-          <ion-select-option value="sms">SMS</ion-select-option>
-        </ion-select>
-      </ion-item>
-      <ion-item>
-        <ion-label>言語化</ion-label>
-          <ion-select [value]="account.language" (ionChange)="onLanguageChange($event)">
-            <ion-select-option value="lang">言語化</ion-select-option>
-            <ion-select-option value="non">非言語化</ion-select-option>
-          </ion-select>
-      </ion-item>
-    </ion-list>
-  </form>
+  <ion-list ion-no-padding>
+    <ion-item>
+      <ion-label position="floating">マルチシグアカウント公開鍵</ion-label>
+      <ion-input
+        type="text"
+        [(ngModel)]="account.multisigPublicKey"
+        name="multisigPublicKey"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">依頼者アカウント秘密鍵</ion-label>
+      <ion-input
+        type="text"
+        [(ngModel)]="account.initiatorPrivateKey"
+        required
+        name="initiatorPrivateKey"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">承認者電話番号</ion-label>
+      <ion-input
+        type="tel"
+        [(ngModel)]="account.parentTel"
+        required
+        name="tel"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>連絡方法</ion-label>
+      <ion-select [value]="account.contact" (ionChange)="onCallChange($event)">
+        <ion-select-option value="tel">電話</ion-select-option>
+        <ion-select-option value="sms">SMS</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>言語化</ion-label>
+      <ion-select
+        [value]="account.language"
+        (ionChange)="onLanguageChange($event)"
+      >
+        <ion-select-option value="lang">言語化</ion-select-option>
+        <ion-select-option value="non">非言語化</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
 </ion-content>
