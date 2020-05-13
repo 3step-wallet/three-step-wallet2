@@ -10,13 +10,6 @@ import { SymbolService } from 'src/app/service/symbol.service';
 })
 export class AccountPage implements OnInit {
 
-  constructor(
-    public accountService: TSAccountService,
-    public symbolService: SymbolService,
-    public modalController: ModalController,
-    public toastController: ToastController,
-  ) { }
-
   account: IAccount = {
     multisigPublicKey: null,
     initiatorPrivateKey: null,
@@ -24,6 +17,13 @@ export class AccountPage implements OnInit {
     contact: null,
     language: null,
   };
+
+  constructor(
+    public accountService: TSAccountService,
+    public symbolService: SymbolService,
+    public modalController: ModalController,
+    public toastController: ToastController,
+  ) { }
 
   ngOnInit() {
   }
@@ -44,6 +44,7 @@ export class AccountPage implements OnInit {
   }
 
   async saveAccount() {
+    console.log(this.account);
     const isValid = await this.symbolService.validateMultisigSetting(
       this.account.initiatorPrivateKey,
       this.account.multisigPublicKey,

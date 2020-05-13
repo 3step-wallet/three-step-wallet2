@@ -1,30 +1,43 @@
-import { Component, OnInit } from '@angular/core';
-import { environment } from '../../environments/environment';
-import { BarcodeScanner, BarcodeScanResult } from '@ionic-native/barcode-scanner/ngx';
-import { CallNumber } from '@ionic-native/call-number/ngx';
-import { SMS } from '@ionic-native/sms/ngx';
-import { LoadingController, AlertController, ModalController } from '@ionic/angular';
-import { NetworkType, TransferTransaction, Address, Listener, TransactionType } from 'symbol-sdk';
-import { IAccount, TSAccountService } from '../service/tsaccount.service';
-import { SymbolService, ITxInfo } from '../service/symbol.service';
-import { AccountPage } from '../setting/account/account.page';
+import { Component, OnInit } from "@angular/core";
+import { environment } from "../../environments/environment";
+import {
+  BarcodeScanner,
+  BarcodeScanResult
+} from "@ionic-native/barcode-scanner/ngx";
+import { CallNumber } from "@ionic-native/call-number/ngx";
+import { SMS } from "@ionic-native/sms/ngx";
+import {
+  LoadingController,
+  AlertController,
+  ModalController
+} from "@ionic/angular";
+import {
+  NetworkType,
+  TransferTransaction,
+  Address,
+  Listener,
+  TransactionType
+} from "symbol-sdk";
+import { IAccount, TSAccountService } from "../service/tsaccount.service";
+import { SymbolService, ITxInfo } from "../service/symbol.service";
+import { AccountPage } from "../setting/account/account.page";
 
 @Component({
-  selector: 'app-tab1',
-  templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss']
+  selector: "app-tab1",
+  templateUrl: "tab1.page.html",
+  styleUrls: ["tab1.page.scss"]
 })
 export class Tab1Page implements OnInit {
   symbolQrData: {
-    v: number,
-    network_id: number,
-    chain_id: number,
-    data: { payload: string }
+    v: number;
+    network_id: number;
+    chain_id: number;
+    data: { payload: string };
   };
   transferTx: TransferTransaction;
   endPoint: string;
   amount = 0;
-  smsMessage = '';
+  smsMessage = "";
   networkType: NetworkType;
   account: IAccount;
   txInfo: ITxInfo;
@@ -37,7 +50,7 @@ export class Tab1Page implements OnInit {
     public sms: SMS,
     public accountService: TSAccountService,
     public symbolService: SymbolService,
-    public modalController: ModalController,
+    public modalController: ModalController
   ) {
     this.endPoint = environment.node.endPoint;
     this.networkType = environment.node.networkType;
@@ -48,7 +61,7 @@ export class Tab1Page implements OnInit {
     const account = this.accountService.getAccount();
     if (!account) {
       const modal = await this.modalController.create({
-        component: AccountPage,
+        component: AccountPage
       });
       await modal.present();
       modal.onWillDismiss().then(() => this.ionViewDidEnter());
@@ -61,29 +74,36 @@ export class Tab1Page implements OnInit {
   }
 
   getAccountXym() {
-    const multisigAddress = Address.createFromPublicKey(this.account.multisigPublicKey, this.networkType);
-    this.symbolService.getAccountXymAmount(multisigAddress).
-    subscribe((m) => {
-      this.amount = m.relativeAmount();
-    });
+    if (this.account) {
+      const multisigAddress = Address.createFromPublicKey(
+        this.account.multisigPublicKey,
+        this.networkType
+      );
+      this.symbolService.getAccountXymAmount(multisigAddress).subscribe(m => {
+        this.amount = m.relativeAmount();
+      });
+    }
   }
 
   runQRScanner() {
-    this.barcodeScanner.scan().then((barcodeData: BarcodeScanResult) => {
-      if (!barcodeData.cancelled && barcodeData.format === 'QR_CODE') {
-        const payload = this.parseQRJSON(barcodeData.text);
-        if (payload) {
-          this.parsePayload(payload);
+    this.barcodeScanner
+      .scan()
+      .then((barcodeData: BarcodeScanResult) => {
+        if (!barcodeData.cancelled && barcodeData.format === "QR_CODE") {
+          const payload = this.parseQRJSON(barcodeData.text);
+          if (payload) {
+            this.parsePayload(payload);
+          }
         }
-      }
-    }).catch((e) => {
-      console.error(e);
-    });
+      })
+      .catch(e => {
+        console.error(e);
+      });
   }
 
   parseQRJSON(barcodeData: string): string {
     this.symbolQrData = JSON.parse(barcodeData);
-    if (this.symbolQrData?.data?.payload) {
+    if (this.symbolQrData.data.payload) {
       console.log(this.symbolQrData.data.payload);
       return this.symbolQrData.data.payload;
     }
@@ -99,34 +119,44 @@ export class Tab1Page implements OnInit {
   }
 
   async payXym() {
-    const wsEndpoint = this.endPoint.replace('http', 'ws');
+    const wsEndpoint = this.endPoint.replace("http", "ws");
     const listener = new Listener(wsEndpoint, WebSocket);
 
     const loading = await this.loadingController.create({
-      message: 'しはらいちゅう',
+      message: "しはらいちゅう"
     });
 
     await loading.present();
 
-    listener.open().then(() => {
-      this.symbolService.sendTxFromMultisig(
-        this.transferTx, listener,
-        this.account.initiatorPrivateKey,
-        this.account.multisigPublicKey).subscribe((x) => {
-          console.log(x);
-          this.smsMessage = this.txInfo.message;
-          this.resetPayStatus(listener, loading);
-          this.showSendTxMessage().then();
-        }, (err) => {
-          console.error(err);
-          this.transferTx = null;
-          loading.dismiss();
-        });
-    }).catch((err) => {
-      console.error(err);
-      this.transferTx = null;
-      loading.dismiss();
-    });
+    listener
+      .open()
+      .then(() => {
+        this.symbolService
+          .sendTxFromMultisig(
+            this.transferTx,
+            listener,
+            this.account.initiatorPrivateKey,
+            this.account.multisigPublicKey
+          )
+          .subscribe(
+            x => {
+              console.log(x);
+              this.smsMessage = this.txInfo.message;
+              this.resetPayStatus(listener, loading);
+              this.showSendTxMessage().then();
+            },
+            err => {
+              console.error(err);
+              this.transferTx = null;
+              loading.dismiss();
+            }
+          );
+      })
+      .catch(err => {
+        console.error(err);
+        this.transferTx = null;
+        loading.dismiss();
+      });
   }
 
   resetPayStatus(listener: Listener, loading: HTMLIonLoadingElement) {
@@ -139,13 +169,14 @@ export class Tab1Page implements OnInit {
 
   async showSendTxMessage() {
     const alert = await this.alertController.create({
-      header: '送金依頼完了',
-      message: 'しょうにんいらいをおくったよ。おかあさんかおとうさんにれんらくしよう',
+      header: "送金依頼完了",
+      message:
+        "しょうにんいらいをおくったよ。おかあさんかおとうさんにれんらくしよう",
       buttons: [
         {
-          text: 'れんらくする',
+          text: "れんらくする",
           handler: () => {
-            if (this.account.contact === 'tel') {
+            if (this.account.contact === "tel") {
               this.callPhone();
             } else {
               this.sendSMS();
@@ -158,14 +189,18 @@ export class Tab1Page implements OnInit {
   }
 
   callPhone() {
-    this.callNumber.callNumber(this.account.parentTel, true).then(
-      (res) => { console.log(`Lunched dialer: ${res}`); }
-    ).catch((e) => { console.error(`Failed lunched dialer: ${e}`); });
+    this.callNumber
+      .callNumber(this.account.parentTel, true)
+      .then(res => {
+        console.log(`Lunched dialer: ${res}`);
+      })
+      .catch(e => {
+        console.error(`Failed lunched dialer: ${e}`);
+      });
   }
 
   sendSMS() {
     this.sms.send(this.account.parentTel, this.smsMessage).then();
     this.smsMessage = null;
   }
-
 }

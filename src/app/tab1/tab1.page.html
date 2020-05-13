@@ -1,9 +1,5 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      おかいもの
-    </ion-title>
-  </ion-toolbar>
+  <ion-toolbar> <ion-title> おかいもの </ion-title> </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -16,40 +12,44 @@
       <ion-note slot="end">{{ amount }} xym</ion-note>
     </ion-item>
   </ion-card>
-  <div *ngIf="account.language === 'lang'">
-    <div class="ion-padding-horizontal">
-      <ion-button expand="block" (click)="runQRScanner()" *ngIf="!transferTx">おかいものをする</ion-button>
+  <ng-container *ngIf="account">
+    <div *ngIf="account.language === 'lang'">
+      <div class="ion-padding-horizontal">
+        <ion-button expand="block" (click)="runQRScanner()" *ngIf="!transferTx"
+          >おかいものをする</ion-button
+        >
+      </div>
+      <ion-card *ngIf="transferTx">
+        <ion-card-header>
+          <ion-card-title>おかねをはらう</ion-card-title>
+        </ion-card-header>
+        <ion-item> <ion-label>しはらいさき</ion-label> </ion-item>
+        <ion-item>
+          <ion-note slot="end">{{ txInfo.recipient }}</ion-note>
+        </ion-item>
+        <ion-item>
+          <ion-label>きんがく</ion-label>
+          <ion-note slot="end">{{ txInfo.amount }} xym</ion-note>
+        </ion-item>
+        <ion-item> <ion-label>メッセージ</ion-label> </ion-item>
+        <ion-item> <ion-note>{{ txInfo.message }}</ion-note> </ion-item>
+      </ion-card>
+      <div class="ion-padding-horizontal">
+        <ion-button expand="block" (click)="(payXym())" *ngIf="transferTx">
+          しはらう
+        </ion-button>
+      </div>
     </div>
-    <ion-card *ngIf="transferTx">
-      <ion-card-header>
-        <ion-card-title>おかねをはらう</ion-card-title>
-      </ion-card-header>
-      <ion-item>
-        <ion-label>しはらいさき</ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-note slot="end">{{ txInfo.recipient }}</ion-note>
-      </ion-item>
-      <ion-item>
-        <ion-label>きんがく</ion-label>
-        <ion-note slot="end">{{ txInfo.amount }} xym</ion-note>
-      </ion-item>
-      <ion-item>
-        <ion-label>メッセージ</ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-note>{{ txInfo.message }}</ion-note>
-      </ion-item>
-    </ion-card>
-    <div class="ion-padding-horizontal">
-      <ion-button expand="block" (click)="(payXym())" *ngIf="transferTx">
-        しはらう
+    <div
+      *ngIf="account.language === 'non'"
+      style="display: flex; justify-content: center;"
+    >
+      <ion-button style="width: 150px; height: 150px;">
+        <ion-icon
+          name="camera-outline"
+          style="width: 150px; height: 150px;"
+        ></ion-icon>
       </ion-button>
     </div>
-  </div>
-  <div *ngIf="account.language === 'non'" style="display: flex; justify-content: center;">
-    <ion-button style="width: 150px; height: 150px;">
-      <ion-icon name="camera-outline" style="width: 150px; height: 150px;"></ion-icon>
-    </ion-button>
-  </div>
+  </ng-container>
 </ion-content>
