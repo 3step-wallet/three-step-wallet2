@@ -9,7 +9,7 @@ export const environment = {
     generationHash: 'ACECD90E7B248E012803228ADB4424F0D966D24149B72E58987D2BF2F2AF03C4',
     networkType: 152,
   },
-  currencyId: '747B276C30626442'
+  currencyId: '519FC24B9223E0B4'
 };
 
 /*
