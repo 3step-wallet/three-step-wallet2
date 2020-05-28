@@ -44,6 +44,7 @@ export class AccountPage implements OnInit {
   }
 
   async saveAccount() {
+    console.log('test');
     const isValid = await this.symbolService.validateMultisigSetting(
       this.account.initiatorPrivateKey,
       this.account.multisigPublicKey,
@@ -67,6 +68,18 @@ export class AccountPage implements OnInit {
 
   dismissModalController() {
     this.modalController.dismiss();
+  }
+
+  onChangePublicKey(event) {
+    this.account.multisigPublicKey = event.target.value;
+  }
+
+  onChengePrivateKey(event) {
+    this.account.initiatorPrivateKey = event.target.value;
+  }
+
+  onTelNumberChange(event) {
+    this.account.parentTel = event.target.value;
   }
 
   onCallChange(event) {

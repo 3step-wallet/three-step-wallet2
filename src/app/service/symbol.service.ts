@@ -158,6 +158,7 @@ export class SymbolService {
         return false;
       }
     } catch (e) {
+      console.error(`failed account setting ${e}`);
       return false;
     }
   }
