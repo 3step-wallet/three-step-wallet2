@@ -83,7 +83,9 @@ export class SymbolService {
                      cosignatoryKey: string,
                      multisigKey: string): Observable<AggregateTransaction> {
     const cosignatory = Account.createFromPrivateKey(cosignatoryKey, this.networkType);
+    // transfertransaction
     const multisig = PublicAccount.createFromPublicKey(multisigKey, this.networkType);
+    //検索 aggregteTransaction?
     const aggregateTx = AggregateTransaction.createBonded(
       Deadline.create(),
       [tx.toAggregate(multisig)],
@@ -91,7 +93,7 @@ export class SymbolService {
     ).setMaxFeeForAggregate(100, 2);
 
     const signedAggregateTx = cosignatory.sign(aggregateTx, this.generationHash);
-
+      //
     const hashLockTx = HashLockTransaction.create(
       Deadline.create(),
       NetworkCurrencyPublic.createRelative(10),

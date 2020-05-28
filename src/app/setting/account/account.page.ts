@@ -50,6 +50,7 @@ export class AccountPage implements OnInit {
     );
     if (isValid) {
       this.accountService.saveAccount(this.account);
+      // saveAccount localStorageに保存
       this.dismissModalController();
     } else {
       await this.showInvalidAccountSettingToast();
