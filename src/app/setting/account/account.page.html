@@ -19,15 +19,15 @@
     <ion-list ion-no-padding>
       <ion-item>
         <ion-label position="floating">マルチシグアカウント公開鍵</ion-label>
-        <ion-input type="text" [(ngModel)]="account.multisigPublicKey" required name="multisigPublicKey"></ion-input>
+        <ion-input type="text" [value]="account.multisigPublicKey" (ionChange)="onChangePublicKey($event)"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating">依頼者アカウント秘密鍵</ion-label>
-        <ion-input type="text" [(ngModel)]="account.initiatorPrivateKey" required name="initiatorPrivateKey"></ion-input>
+        <ion-input type="text" [value]="account.initiatorPrivateKey" (ionChange)="onChengePrivateKey($event)"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating">承認者電話番号</ion-label>
-        <ion-input type="tel" [(ngModel)]="account.parentTel" required name="tel"></ion-input>
+        <ion-input type="tel" [value]="account.parentTel" (ionChange)="onTelNumberChange($event)"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>連絡方法</ion-label>

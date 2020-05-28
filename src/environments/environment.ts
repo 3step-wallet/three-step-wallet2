@@ -6,10 +6,10 @@ export const environment = {
   production: false,
   node: {
     endPoint: 'https://sym-test.opening-line.jp:3001',
-    generationHash: '44D2225B8932C9A96DCB13508CBCDFFA9A9663BFBA2354FEEC8FCFCB7E19846C',
+    generationHash: 'ACECD90E7B248E012803228ADB4424F0D966D24149B72E58987D2BF2F2AF03C4',
     networkType: 152,
   },
-  currencyId: '747B276C30626442'
+  currencyId: '519FC24B9223E0B4'
 };
 
 /*
