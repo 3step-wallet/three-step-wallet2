@@ -44,6 +44,10 @@ export class Tab2Page {
     const wsEndpoint = this.endPoint.replace('http', 'ws');
     const listener = new Listener(wsEndpoint, WebSocket);
   }
+  
+  // Symbol.geConfirmTxs(address)
+  // multisigのアカウントを引数にとり、①空のaccountRepository作る　②TransactionFilter作る（new TransactionFilter)
+  // ③ ②をいれたaccountRepositoryを返す
   getConfirmTxs() {
     this.symbolService.getConfirmTxs(this.multisigAccount.address).subscribe(
       (txs) => {

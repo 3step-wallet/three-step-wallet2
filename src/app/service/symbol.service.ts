@@ -1,14 +1,31 @@
-import { Injectable } from '@angular/core';
-import { Address, RepositoryFactoryHttp, MosaicService,
-  MosaicAmountView, TransferTransaction, Listener,
-  NetworkType, Account, PublicAccount, AggregateTransaction,
-  Deadline, HashLockTransaction, NetworkCurrencyPublic,
-  UInt64, TransactionService, TransactionFilter, TransactionType } from 'symbol-sdk';
-import { environment } from 'src/environments/environment';
-import { mergeMap, first, filter, map, toArray } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-import { ConfirmedTxInfo } from '../model/confirmed-tx-info';
-import { PartialTxInfo } from '../model/partial-tx-info';
+import { Injectable } from "@angular/core";
+import {
+  Address,
+  RepositoryFactoryHttp,
+  MosaicService,
+  MosaicAmountView,
+  TransferTransaction,
+  Listener,
+  NetworkType,
+  Account,
+  PublicAccount,
+  AggregateTransaction,
+  Deadline,
+  HashLockTransaction,
+  NetworkCurrencyPublic,
+  UInt64,
+  TransactionService,
+  TransactionFilter,
+  TransactionType,
+
+  CosignatureSignedTransaction,
+  CosignatureTransaction,
+} from "symbol-sdk";
+import { environment } from "src/environments/environment";
+import { mergeMap, first, filter, map, toArray } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { ConfirmedTxInfo } from "../model/confirmed-tx-info";
+import { PartialTxInfo } from "../model/partial-tx-info";
 
 export interface ITxInfo {
   recipient: string;
@@ -17,18 +34,20 @@ export interface ITxInfo {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class SymbolService {
-
   repositoryFactory: RepositoryFactoryHttp;
   networkType: NetworkType;
   generationHash: string;
 
   constructor() {
-    this.repositoryFactory = new RepositoryFactoryHttp(environment.node.endPoint);
+    this.repositoryFactory = new RepositoryFactoryHttp(
+      environment.node.endPoint
+    );
     this.networkType = environment.node.networkType;
-    this.generationHash = environment.node.generationHash;
+    this.generationHash = environment.node.generationHash; //定数
+    
   }
 
   getAccountXymAmount(address: Address): Observable<MosaicAmountView> {
@@ -36,15 +55,14 @@ export class SymbolService {
       this.repositoryFactory.createAccountRepository(),
       this.repositoryFactory.createMosaicRepository()
     );
-    return mosaicService.mosaicsAmountViewFromAddress(address)
-    .pipe(
+    return mosaicService.mosaicsAmountViewFromAddress(address).pipe(
       mergeMap((_) => _),
-      first((m) => m.fullName() === environment.currencyId),
+      first((m) => m.fullName() === environment.currencyId)
     );
   }
 
   parseTx(tx: TransferTransaction): ITxInfo {
-    const recipient = this.recipientAddressFromTx(tx);
+    const recipient = this.recipientAddressFromTx(tx); // 送信者？
     const amount = this.amountFromTx(tx);
     const message = this.messageFromTx(tx);
     return {
@@ -56,9 +74,9 @@ export class SymbolService {
 
   private recipientAddressFromTx(tx: TransferTransaction): string {
     if (tx.recipientAddress instanceof Address) {
-      return tx.recipientAddress.pretty();
+      return tx.recipientAddress.pretty(); // Get address in pretty format ex: SB3KUB-HATFCP-V7UZQL-WAQ2EU-R6SIHB-SBEOED-DDF3.
     } else {
-      return tx.recipientAddress.id.toHex();
+      return tx.recipientAddress.id.toHex(); // Get string value of id
     }
   }
 
@@ -78,52 +96,50 @@ export class SymbolService {
     return tx.message.payload;
   }
 
-  sendTxFromMultisig(tx: TransferTransaction,
-                     listener: Listener,
-                     cosignatoryKey: string,
-                     multisigKey: string): Observable<AggregateTransaction> {
-    const cosignatory = Account.createFromPrivateKey(cosignatoryKey, this.networkType);
-    // transfertransaction
-    const multisig = PublicAccount.createFromPublicKey(multisigKey, this.networkType);
-    //検索 aggregteTransaction?
-    const aggregateTx = AggregateTransaction.createBonded(
-      Deadline.create(),
-      [tx.toAggregate(multisig)],
-      this.networkType
-    ).setMaxFeeForAggregate(100, 2);
+  // ↓　ここから書き換え
+  signatureMultisig(privateKey, networkType){ 
+    const cosignAggregateBondedTransaction = (transaction: AggregateTransaction, account: Account): CosignatureSignedTransaction => {
+      const cosignatureTransaction = CosignatureTransaction.create(transaction);
+      return account.signCosignatureTransaction(cosignatureTransaction);
+  };
 
-    const signedAggregateTx = cosignatory.sign(aggregateTx, this.generationHash);
-      //
-    const hashLockTx = HashLockTransaction.create(
-      Deadline.create(),
-      NetworkCurrencyPublic.createRelative(10),
-      UInt64.fromUint(1000),
-      signedAggregateTx,
-      this.networkType
-    ).setMaxFee(100);
+    const accountHttp = this.repositoryFactory.createAccountRepository();
+    // return new AccountHttp(this.url); <= ???
+    // AccountRepositoryインターフェイスを返してる。つまり↑は空のインターフェイス
+    // 内容はgetAccountInfo(): Observable<AccontInfo> とgetAccountsInfo(): Observable<AccontInfo[]>
+    const transactionHttp = this.repositoryFactory.createTransactionRepository();
 
-    const signedHashLockTx = cosignatory.sign(hashLockTx, this.generationHash);
-
-    const transactionService = new TransactionService(
-      this.repositoryFactory.createTransactionRepository(),
-      this.repositoryFactory.createReceiptRepository()
-    );
-
-    return transactionService.announceHashLockAggregateBonded(signedHashLockTx, signedAggregateTx, listener);
+    const account = Account.createFromPrivateKey(privateKey, networkType);
+  
+    accountHttp
+    .getAccountPartialTransactions(account.address)
+    .pipe(
+        mergeMap((_) => _),
+        filter((_) => !_.signedByAccount(account.publicAccount)),
+        map((transaction) => cosignAggregateBondedTransaction(transaction, account)),
+        mergeMap((cosignatureSignedTransaction) =>
+            transactionHttp.announceAggregateBondedCosignature(cosignatureSignedTransaction)),
+    )
+    .subscribe((announcedTransaction) => console.log(announcedTransaction),
+        (err) => console.error(err));
   }
+// ↑　ここまで
 
-  getConfirmTxs(address: Address): Observable<ConfirmedTxInfo[]> {
-    const accountRepository = this.repositoryFactory.createAccountRepository();
-    const transactionFilter = new TransactionFilter({types: [TransactionType.AGGREGATE_BONDED] });
-    return accountRepository.getAccountTransactions(address, null, transactionFilter).pipe(
+getConfirmTxs(address: Address): Observable<ConfirmedTxInfo[]> {
+  const accountRepository = this.repositoryFactory.createAccountRepository();
+  const transactionFilter = new TransactionFilter({
+    types: [TransactionType.AGGREGATE_BONDED],
+  });
+  return accountRepository
+    .getAccountTransactions(address, null, transactionFilter)
+    .pipe(
       mergeMap((_) => _),
       filter((t) => t.type === TransactionType.AGGREGATE_BONDED),
       map((t) => t as AggregateTransaction),
-      map((t) =>  this.parseConfirmedTx(t)),
+      map((t) => this.parseConfirmedTx(t)),
       toArray()
     );
-  }
-
+}
   private parseConfirmedTx(tx: AggregateTransaction): ConfirmedTxInfo {
     return ConfirmedTxInfo.txInfoFromAggregateTx(tx);
   }
@@ -142,20 +158,32 @@ export class SymbolService {
     return PartialTxInfo.txInfoFromAggregateTx(tx);
   }
 
-  public async validateMultisigSetting(cosignatoryKey: string, multisigKey: string) {
+  public async validateMultisigSetting(
+    cosignatoryKey: string,
+    multisigKey: string
+  ) {
     const networkType = environment.node.networkType;
     const multisigRepository = this.repositoryFactory.createMultisigRepository();
 
     try {
-      const cosignatoryAccount = Account.createFromPrivateKey(cosignatoryKey, networkType);
+      const cosignatoryAccount = Account.createFromPrivateKey(
+        cosignatoryKey,
+        networkType
+      );
       console.log(cosignatoryAccount);
-      const multisigAccount = PublicAccount.createFromPublicKey(multisigKey, networkType);
+      const multisigAccount = PublicAccount.createFromPublicKey(
+        multisigKey,
+        networkType
+      );
       console.log(multisigAccount);
-      const result = await multisigRepository.getMultisigAccountInfo(multisigAccount.address).pipe(
-        map((m) => m.cosignatories),
-        mergeMap((_) => _),
-        first((c) => c.publicKey === cosignatoryAccount.publicKey)
-      ).toPromise();
+      const result = await multisigRepository
+        .getMultisigAccountInfo(multisigAccount.address)
+        .pipe(
+          map((m) => m.cosignatories),
+          mergeMap((_) => _),
+          first((c) => c.publicKey === cosignatoryAccount.publicKey)
+        )
+        .toPromise();
       console.log(result);
       if (result) {
         return true;
@@ -163,7 +191,7 @@ export class SymbolService {
         return false;
       }
     } catch (e) {
-      console.log('こんにちは', e);
+      console.log("こんにちは", e);
       return false;
     }
   }
