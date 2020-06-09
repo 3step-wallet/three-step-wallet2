@@ -65,7 +65,6 @@ export class Tab1Page implements OnInit {
     this.symbolService.getAccountXymAmount(multisigAddress).
     subscribe((m) => {
       this.amount = m.relativeAmount();
-      console.log('amount', this.amount);
     });
   }
 
