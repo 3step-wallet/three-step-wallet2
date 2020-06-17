@@ -139,7 +139,7 @@ export class Tab1Page implements OnInit {
 
   async showSendTxMessage() {
     const alert = await this.alertController.create({
-      header: '送金依頼完了',
+      header: 'そうきんいらいをおくったよ',
       message: 'しょうにんいらいをおくったよ。おかあさんかおとうさんにれんらくしよう',
       buttons: [
         {
