@@ -26,6 +26,7 @@ import { mergeMap, first, filter, map, toArray } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { ConfirmedTxInfo } from "../model/confirmed-tx-info";
 import { PartialTxInfo } from "../model/partial-tx-info";
+import { IAccount } from './tsaccount.service';
 
 export interface ITxInfo {
   recipient: string;
@@ -40,6 +41,7 @@ export class SymbolService {
   repositoryFactory: RepositoryFactoryHttp;
   networkType: NetworkType;
   generationHash: string;
+  initiatorPrivateKey: string;
 
   constructor() {
     this.repositoryFactory = new RepositoryFactoryHttp(
@@ -97,30 +99,42 @@ export class SymbolService {
   }
 
   // ↓　ここから書き換え
-  signatureMultisig(privateKey, networkType){ 
-    const cosignAggregateBondedTransaction = (transaction: AggregateTransaction, account: Account): CosignatureSignedTransaction => {
+  signatureMultisig(privateKey, cosignaccount,) {
+    console.log(`takurin start`)
+   
+    const cosignAggregateBondedTransaction = (transaction: AggregateTransaction, cosignaccount: Account): CosignatureSignedTransaction => {
       const cosignatureTransaction = CosignatureTransaction.create(transaction);
-      return account.signCosignatureTransaction(cosignatureTransaction);
+      return cosignaccount.signCosignatureTransaction(cosignatureTransaction);
   };
-
     const accountHttp = this.repositoryFactory.createAccountRepository();
+    console.log(`accountHttp:${accountHttp}`);
     // return new AccountHttp(this.url); <= ???
     // AccountRepositoryインターフェイスを返してる。つまり↑は空のインターフェイス
     // 内容はgetAccountInfo(): Observable<AccontInfo> とgetAccountsInfo(): Observable<AccontInfo[]>
     const transactionHttp = this.repositoryFactory.createTransactionRepository();
+    console.log(`transactionHttp:${transactionHttp}`);
+    const account = Account.createFromPrivateKey(privateKey, this.networkType);
+    console.log(`account:${account}`);
 
-    const account = Account.createFromPrivateKey(privateKey, networkType);
-  
     accountHttp
-    .getAccountPartialTransactions(account.address)
+    .getAccountPartialTransactions(account.address) // of(1, 3, 5)
     .pipe(
-        mergeMap((_) => _),
-        filter((_) => !_.signedByAccount(account.publicAccount)),
-        map((transaction) => cosignAggregateBondedTransaction(transaction, account)),
+        mergeMap((_) => _),// これいるか？非同期処理にしたいから？
+        filter((_) => !_.signedByAccount(account.publicAccount)), //true返すのだけ残る
+        map((transaction) => cosignAggregateBondedTransaction(transaction, cosignaccount)),
         mergeMap((cosignatureSignedTransaction) =>
             transactionHttp.announceAggregateBondedCosignature(cosignatureSignedTransaction)),
+            // ↑メソッドの説明以下
+          //   public announceAggregateBondedCosignature(
+          //     cosignatureSignedTransaction: CosignatureSignedTransaction,
+          // ): Observable<TransactionAnnounceResponse> {
+          //     return observableFrom(this.transactionRoutesApi.announceCosignatureTransaction(cosignatureSignedTransaction)).pipe(
+          //         map(({ body }) => new TransactionAnnounceResponse(body.message)),
+          //         catchError((error) => throwError(this.errorHandling(error))),
+          //     );
+
     )
-    .subscribe((announcedTransaction) => console.log(announcedTransaction),
+    .subscribe((announcedTransaction) => console.log(`announcedTransactioin:${announcedTransaction}`),
         (err) => console.error(err));
   }
 // ↑　ここまで

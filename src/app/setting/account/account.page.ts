@@ -23,6 +23,7 @@ export class AccountPage implements OnInit {
     parentTel: null,
     contact: null,
     language: null,
+    coPrivateKey: null,
   };
 
   ngOnInit() {
@@ -54,6 +55,7 @@ export class AccountPage implements OnInit {
     console.log('3', this.account.parentTel);
     console.log('4', this.account.contact);
     console.log('5', this.account.language);
+    console.log('6', this.account.coPrivateKey);
     if (isValid) {
       this.accountService.saveAccount(this.account);
       // saveAccount localStorageに保存
@@ -94,6 +96,10 @@ export class AccountPage implements OnInit {
 
   onLanguageChange(event) {
     this.account.language = event.target.value;
+  }
+
+  oncoPrivateKeyChange(event) {
+    this.account.coPrivateKey = event.target.value;
   }
 
 }

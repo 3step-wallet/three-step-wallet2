@@ -6,7 +6,7 @@ import { SMS } from '@ionic-native/sms/ngx';
 import { LoadingController, AlertController, ModalController } from '@ionic/angular';
 import { NetworkType, TransferTransaction, Address, Listener, TransactionType } from 'symbol-sdk';
 import { IAccount, TSAccountService } from '../service/tsaccount.service';
-import { SymbolService, ITxInfo } from '../service/symbol.service';
+import { SymbolService, ITxInfo} from '../service/symbol.service';
 import { AccountPage } from '../setting/account/account.page';
 
 @Component({
@@ -45,6 +45,7 @@ export class Tab1Page implements OnInit {
   }
 
   async ngOnInit() {
+
     const account = this.accountService.getAccount();
     if (!account) {
       const modal = await this.modalController.create({
@@ -109,25 +110,25 @@ export class Tab1Page implements OnInit {
 
     await loading.present();
 
-    listener.open().then(() => {
-      this.symbolService.sendTxFromMultisig(
-        this.transferTx, listener,
-        this.account.initiatorPrivateKey,
-        this.account.multisigPublicKey).subscribe((x) => {
-          console.log(x);
-          this.smsMessage = this.txInfo.message;
-          this.resetPayStatus(listener, loading);
-          this.showSendTxMessage().then();
-        }, (err) => {
-          console.error(err);
-          this.transferTx = null;
-          loading.dismiss();
-        });
-    }).catch((err) => {
-      console.error(err);
-      this.transferTx = null;
-      loading.dismiss();
-    });
+    // listener.open().then(() => {
+    //   this.symbolService.sendTxFromMultisig(
+    //     this.transferTx, listener,
+    //     this.account.initiatorPrivateKey,
+    //     this.account.multisigPublicKey).subscribe((x) => {
+    //       console.log(x);
+    //       this.smsMessage = this.txInfo.message;
+    //       this.resetPayStatus(listener, loading);
+    //       this.showSendTxMessage().then();
+    //     }, (err) => {
+    //       console.error(err);
+    //       this.transferTx = null;
+    //       loading.dismiss();
+    //     });
+    // }).catch((err) => {
+    //   console.error(err);
+    //   this.transferTx = null;
+    //   loading.dismiss();
+    // });
   }
 
   resetPayStatus(listener: Listener, loading: HTMLIonLoadingElement) {

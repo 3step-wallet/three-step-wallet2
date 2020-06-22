@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 export interface IAccount {
   multisigPublicKey: string;
   initiatorPrivateKey: string;
+  coPrivateKey?: string;
   parentTel: string;
   contact: string;
   language: string;
@@ -25,6 +26,7 @@ export class TSAccountService {
   }
 
   saveAccount(account: IAccount) {
+    
     localStorage.account = JSON.stringify(account);
   }
 }

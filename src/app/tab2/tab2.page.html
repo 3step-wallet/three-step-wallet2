@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
+    <ion-title >
       履歴
     </ion-title>
   </ion-toolbar>
@@ -9,6 +9,7 @@
 <ion-content [fullscreen]="true">
   <ion-list>
     <ion-list-header>承認待ち</ion-list-header>
+    <ion-button (click) = "pressPartial()">承認待ちログで取ってくる</ion-button>
     <ion-card *ngFor="let tx of partialTxs" href="http://explorer.symboldev.network/transaction/{{ tx.txHash }}">
       <app-tx-header
         hash="{{ tx.txHash }}"

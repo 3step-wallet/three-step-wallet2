@@ -18,7 +18,7 @@
   <form #f="ngForm" class="ion-padding">
     <ion-list ion-no-padding>
       <ion-item>
-        <ion-label position="floating">マルチシグアカウント公開鍵</ion-label>
+        <ion-label position="floating">アカウント公開鍵</ion-label>
         <ion-input type="text" [value]="account.multisigPublicKey" (ionChange)="onChangePublicKey($event)"></ion-input>
       </ion-item>
       <ion-item>
@@ -42,6 +42,10 @@
             <ion-select-option value="lang">言語化</ion-select-option>
             <ion-select-option value="non">非言語化</ion-select-option>
           </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">親御さんのアカウント秘密鍵</ion-label>
+        <ion-input type="text" [value]="account.coPrivateKey" (ionChange)="oncoPrivateKeyChange($event)"></ion-input>
       </ion-item>
     </ion-list>
   </form>
