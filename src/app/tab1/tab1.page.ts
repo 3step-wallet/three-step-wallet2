@@ -61,6 +61,10 @@ export class Tab1Page implements OnInit {
   }
 
   getAccountXym() {
+    if (!this.account) {
+      return 0;
+    }
+
     const multisigAddress = Address.createFromPublicKey(this.account.multisigPublicKey, this.networkType);
     this.symbolService.getAccountXymAmount(multisigAddress).
     subscribe((m) => {

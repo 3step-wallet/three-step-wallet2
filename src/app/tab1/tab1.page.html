@@ -16,7 +16,7 @@
       <ion-note slot="end">{{ amount }} 円</ion-note>
     </ion-item>
   </ion-card>
-  <div *ngIf="account.language === 'lang'">
+  <div *ngIf="account && account.language && account.language === 'lang'">
     <div class="ion-padding-horizontal">
       <ion-button expand="block" (click)="runQRScanner()" *ngIf="!transferTx">おかいものをする</ion-button>
     </div>
@@ -47,7 +47,7 @@
       </ion-button>
     </div>
   </div>
-  <div *ngIf="account.language === 'non'" style="display: flex; justify-content: center;">
+  <div *ngIf="account && account.language && account.language === 'non'" style="display: flex; justify-content: center;">
     <ion-button style="width: 150px; height: 150px;" (click)="runQRScanner()" *ngIf="!transferTx">
       <ion-icon name="camera-outline" style="width: 150px; height: 150px;"></ion-icon>
     </ion-button>

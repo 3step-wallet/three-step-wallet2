@@ -10,7 +10,7 @@ This wallet using [Symbol blockchain](https://nemtech.github.io/).
 
 ## Symbol blockchain
 
-- This app using Symbol Testnet(v0.9.3.1)
+- This app using Symbol Testnet(v0.9.4.1)
 - Before using this app, create multisig account by [symbol desktop wallet](https://github.com/nemfoundation/symbol-desktop-wallet) or [symbol-cli](https://github.com/nemtech/symbol-cli).
 
 ## How to run
@@ -32,4 +32,12 @@ This wallet using [Symbol blockchain](https://nemtech.github.io/).
 
 ```
 % ionic capacitor run android -l --external
+```
+
+## Notice
+
+Add to permission to AndroidManifest.xml
+
+```
+<uses-permission android:name="android.permission.SEND_SMS"/>
 ```
