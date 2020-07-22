@@ -147,6 +147,8 @@ export class SymbolService {
     try {
       const cosignatoryAccount = Account.createFromPrivateKey(cosignatoryKey, networkType);
       const multisigAccount = PublicAccount.createFromPublicKey(multisigKey, networkType);
+      console.log(cosignatoryAccount);
+      console.log(multisigAccount);
       const result = await multisigRepository.getMultisigAccountInfo(multisigAccount.address).pipe(
         map((m) => m.cosignatories),
         mergeMap((_) => _),
