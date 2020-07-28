@@ -23,7 +23,7 @@ export class Tab1Page implements OnInit {
   };
   transferTx: TransferTransaction;
   endPoint: string;
-  amount = 0;
+  amount = 50;
   smsMessage = '';
   networkType: NetworkType;
   account: IAccount;
@@ -68,7 +68,8 @@ export class Tab1Page implements OnInit {
     const multisigAddress = Address.createFromPublicKey(this.account.multisigPublicKey, this.networkType);
     this.symbolService.getAccountXymAmount(multisigAddress).
     subscribe((m) => {
-      this.amount = m.relativeAmount();
+      this.amount = localStorage.amount;
+      localStorage.amount = this.amount;
     });
   }
 
@@ -170,6 +171,21 @@ export class Tab1Page implements OnInit {
   sendSMS() {
     this.sms.send(this.account.parentTel, this.smsMessage).then();
     this.smsMessage = null;
+  }
+
+  discount() {
+    if (this.amount > 0) {
+      this.amount -= 10;
+      localStorage.amount = this.amount;
+    }
+    if (this.amount <= 0) {
+      alert('最後の買い物です');
+    }
+  }
+
+  reset() {
+    this.amount = 50;
+    localStorage.amount = this.amount;
   }
 
 }
