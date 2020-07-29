@@ -73,17 +73,20 @@ export class Tab1Page implements OnInit {
     });
   }
 
+  // runQRScanner() {
+  //   this.barcodeScanner.scan().then((barcodeData: BarcodeScanResult) => {
+  //     if (!barcodeData.cancelled && barcodeData.format === 'QR_CODE') {
+  //       const payload = this.parseQRJSON(barcodeData.text);
+  //       if (payload) {
+  //         this.parsePayload(payload);
+  //       }
+  //     }
+  //   }).catch((e) => {
+  //     console.error(e);
+  //   });
+  // }
   runQRScanner() {
-    this.barcodeScanner.scan().then((barcodeData: BarcodeScanResult) => {
-      if (!barcodeData.cancelled && barcodeData.format === 'QR_CODE') {
-        const payload = this.parseQRJSON(barcodeData.text);
-        if (payload) {
-          this.parsePayload(payload);
-        }
-      }
-    }).catch((e) => {
-      console.error(e);
-    });
+    this.showSendTxMessage();
   }
 
   parseQRJSON(barcodeData: string): string {
@@ -144,8 +147,10 @@ export class Tab1Page implements OnInit {
 
   async showSendTxMessage() {
     const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
       header: '送金依頼完了',
-      message: 'しょうにんいらいをおくったよ。おかあさんかおとうさんにれんらくしよう',
+      // message: 'しょうにんいらいをおくったよ。おかあさんかおとうさんにれんらくしよう',
+      message: '<ion-button><ion-img src="../../assets/img/call.png"></ion-img></ion-button>',
       buttons: [
         {
           text: 'れんらくする',
