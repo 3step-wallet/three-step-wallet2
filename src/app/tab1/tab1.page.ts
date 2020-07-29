@@ -73,6 +73,13 @@ export class Tab1Page implements OnInit {
   }
 
   runQRScanner() {
+    // ローカルテスト用
+    // tslint:disable-next-line:max-line-length
+    // const text = `{"v":3,"type":3,"network_id":152,"chain_id":"ACECD90E7B248E012803228ADB4424F0D966D24149B72E58987D2BF2F2AF03C4","data":{"payload":"DB00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000198544150C300000000000019B5A1DA0300000098155FE225BD9D1C0A5592A88B44A728471060897352CEFC65012B0000000000B4E023924BC29F51002D31010000000000E3828FE3818BE381B0E7A5ADE3828AE38381E383ADE383ABE38381E383A7E382B3E381A0E38288EFBC81"}}`;
+    // const payload = this.parseQRJSON(text);
+    // if (payload) {
+    //   this.parsePayload(payload);
+    // }
     this.barcodeScanner.scan().then((barcodeData: BarcodeScanResult) => {
       if (!barcodeData.cancelled && barcodeData.format === 'QR_CODE') {
         const payload = this.parseQRJSON(barcodeData.text);
@@ -143,7 +150,7 @@ export class Tab1Page implements OnInit {
 
   async showSendTxMessage() {
     const alert = await this.alertController.create({
-      header: '送金依頼完了',
+      header: 'そうきんいらいをおくったよ',
       message: 'しょうにんいらいをおくったよ。おかあさんかおとうさんにれんらくしよう',
       buttons: [
         {
