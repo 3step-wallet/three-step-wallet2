@@ -49,7 +49,7 @@
   </div>
   <div *ngIf="account && account.language && account.language === 'non'" style="display: flex; justify-content: center;">
     <ion-button style="width: 150px; height: 150px;" (click)="runQRScanner()" *ngIf="!transferTx">
-      <ion-icon name="camera-outline" style="width: 150px; height: 150px;"></ion-icon>
+      <ion-img src="../../assets/img/kaimono.png"></ion-img>
     </ion-button>
     <ion-button style="width: 150px; height: 150px;" (click)="(payXym())" *ngIf="transferTx">
       <ion-icon name="send-outline" style="width: 150px; height: 150px;"></ion-icon>
