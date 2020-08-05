@@ -36,7 +36,7 @@ This wallet using [Symbol blockchain](https://nemtech.github.io/).
 
 ## Notice
 
-Add to permission to AndroidManifest.xml
+Add permission to AndroidManifest.xml
 
 ```
 <uses-permission android:name="android.permission.SEND_SMS"/>

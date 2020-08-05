@@ -8,6 +8,7 @@ import { NetworkType, TransferTransaction, Address, Listener, TransactionType } 
 import { IAccount, TSAccountService } from '../service/tsaccount.service';
 import { SymbolService, ITxInfo } from '../service/symbol.service';
 import { AccountPage } from '../setting/account/account.page';
+import { BalanceService } from '../service/balance.service';
 
 @Component({
   selector: 'app-tab1',
@@ -23,7 +24,7 @@ export class Tab1Page implements OnInit {
   };
   transferTx: TransferTransaction;
   endPoint: string;
-  amount = 50;
+  amount: number;
   smsMessage = '';
   networkType: NetworkType;
   account: IAccount;
@@ -38,6 +39,7 @@ export class Tab1Page implements OnInit {
     public accountService: TSAccountService,
     public symbolService: SymbolService,
     public modalController: ModalController,
+    public balanceService: BalanceService,
   ) {
     this.endPoint = environment.node.endPoint;
     this.networkType = environment.node.networkType;
@@ -57,19 +59,7 @@ export class Tab1Page implements OnInit {
 
   ionViewDidEnter() {
     this.account = this.accountService.getAccount();
-    this.getAccountXym();
-  }
-
-  getAccountXym() {
-    if (!this.account) {
-      return 0;
-    }
-
-    const multisigAddress = Address.createFromPublicKey(this.account.multisigPublicKey, this.networkType);
-    this.symbolService.getAccountXymAmount(multisigAddress).
-    subscribe((m) => {
-      this.amount = localStorage.amount;
-    });
+    this.amount = this.balanceService.getBalance();
   }
 
   runQRScanner() {
@@ -123,7 +113,7 @@ export class Tab1Page implements OnInit {
         this.account.multisigPublicKey).subscribe((x) => {
           console.log(x);
           this.smsMessage = this.txInfo.message;
-          localStorage.amount = this.amount - this.txInfo.amount;
+          this.amount = this.balanceService.reduceBalance(this.txInfo.amount);
           this.resetPayStatus(listener, loading);
           this.showSendTxMessage().then();
         }, (err) => {
@@ -143,7 +133,6 @@ export class Tab1Page implements OnInit {
     this.transferTx = null;
     this.txInfo = null;
     loading.dismiss();
-    this.getAccountXym();
   }
 
   async showSendTxMessage() {
