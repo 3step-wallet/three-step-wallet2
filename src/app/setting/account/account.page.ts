@@ -9,6 +9,7 @@ import { SymbolService } from 'src/app/service/symbol.service';
   styleUrls: ['./account.page.scss'],
 })
 export class AccountPage implements OnInit {
+  amount = 50;
 
   constructor(
     public accountService: TSAccountService,
@@ -52,6 +53,7 @@ export class AccountPage implements OnInit {
     if (isValid) {
       this.accountService.saveAccount(this.account);
       this.dismissModalController();
+      localStorage.amount = this.amount;
     } else {
       await this.showInvalidAccountSettingToast();
     }
