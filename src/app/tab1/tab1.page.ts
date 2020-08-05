@@ -69,25 +69,25 @@ export class Tab1Page implements OnInit {
     this.symbolService.getAccountXymAmount(multisigAddress).
     subscribe((m) => {
       this.amount = localStorage.amount;
-      localStorage.amount = this.amount;
     });
   }
 
-  // runQRScanner() {
-  //   this.barcodeScanner.scan().then((barcodeData: BarcodeScanResult) => {
-  //     if (!barcodeData.cancelled && barcodeData.format === 'QR_CODE') {
-  //       const payload = this.parseQRJSON(barcodeData.text);
-  //       if (payload) {
-  //         this.parsePayload(payload);
-  //       }
-  //     }
-  //   }).catch((e) => {
-  //     console.error(e);
-  //   });
-  // }
   runQRScanner() {
-    this.showSendTxMessage();
+    this.barcodeScanner.scan().then((barcodeData: BarcodeScanResult) => {
+      if (!barcodeData.cancelled && barcodeData.format === 'QR_CODE') {
+        const payload = this.parseQRJSON(barcodeData.text);
+        if (payload) {
+          this.parsePayload(payload);
+        }
+      }
+    }).catch((e) => {
+      console.error(e);
+    });
   }
+  // 確認用
+  // runQRScanner() {
+  //   this.showSendTxMessage();
+  // }
 
   parseQRJSON(barcodeData: string): string {
     this.symbolQrData = JSON.parse(barcodeData);
