@@ -123,6 +123,7 @@ export class Tab1Page implements OnInit {
         this.account.multisigPublicKey).subscribe((x) => {
           console.log(x);
           this.smsMessage = this.txInfo.message;
+          localStorage.amount = this.amount - this.txInfo.amount;
           this.resetPayStatus(listener, loading);
           this.showSendTxMessage().then();
         }, (err) => {
@@ -178,19 +179,19 @@ export class Tab1Page implements OnInit {
     this.smsMessage = null;
   }
 
-  discount() {
-    if (this.amount > 0) {
-      this.amount -= 10;
-      localStorage.amount = this.amount;
-    }
-    if (this.amount <= 0) {
-      alert('最後の買い物です');
-    }
-  }
+  // discount() {
+  //   if (this.amount > 0) {
+  //     this.amount -= 10;
+  //     localStorage.amount = this.amount;
+  //   }
+  //   if (this.amount <= 0) {
+  //     alert('最後の買い物です');
+  //   }
+  // }
 
-  reset() {
-    this.amount = 50;
-    localStorage.amount = this.amount;
-  }
+  // reset() {
+  //   this.amount = 50;
+  //   localStorage.amount = this.amount;
+  // }
 
 }

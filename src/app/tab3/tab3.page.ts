@@ -8,6 +8,7 @@ import { AccountPage } from '../setting/account/account.page';
   styleUrls: ['tab3.page.scss']
 })
 export class Tab3Page {
+  amount = 50;
 
   constructor(
     public modalController: ModalController,
@@ -18,6 +19,10 @@ export class Tab3Page {
       component: AccountPage,
     });
     modal.present();
+  }
+
+  reset() {
+    localStorage.amount = this.amount;
   }
 
 }
