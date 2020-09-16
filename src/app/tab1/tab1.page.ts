@@ -4,7 +4,7 @@ import { BarcodeScanner, BarcodeScanResult } from '@ionic-native/barcode-scanner
 import { CallNumber } from '@ionic-native/call-number/ngx';
 import { SMS } from '@ionic-native/sms/ngx';
 import { LoadingController, AlertController, ModalController } from '@ionic/angular';
-import { NetworkType, TransferTransaction, Address, Listener, TransactionType } from 'symbol-sdk';
+import { NetworkType, TransferTransaction, Address, Listener, TransactionType, Deadline, NetworkCurrencyPublic, PlainMessage } from 'symbol-sdk';
 import { IAccount, TSAccountService } from '../service/tsaccount.service';
 import { SymbolService, ITxInfo } from '../service/symbol.service';
 import { AccountPage } from '../setting/account/account.page';
@@ -89,11 +89,23 @@ export class Tab1Page implements OnInit {
   }
 
   parsePayload(payload) {
-    const tx = TransferTransaction.createFromPayload(payload);
-    if (tx.type === TransactionType.TRANSFER) {
-      this.transferTx = tx as TransferTransaction;
-      this.txInfo = this.symbolService.parseTx(this.transferTx);
-    }
+    const addr = payload.data.addr;
+    const amount = payload.data.amount;
+    const message = payload.data.msg;
+    this.transferTx = TransferTransaction.create(
+      Deadline.create(),
+      Address.createFromRawAddress(addr),
+      [NetworkCurrencyPublic.createRelative(amount)],
+      PlainMessage.create(message),
+      this.networkType,
+    );
+    this.txInfo = this.symbolService.parseTx(this.transferTx);
+    // this.qrJson = NemUtil.getQRcodeJson(2, 2, 'nem-wallet', this.toAddr, this.toAmount, this.message);
+    // const tx = TransferTransaction.createFromPayload(payload);
+    // if (tx.type === TransactionType.TRANSFER) {
+    //   this.transferTx = tx as TransferTransaction;
+    //   this.txInfo = this.symbolService.parseTx(this.transferTx);
+    // }
   }
 
   async payXym() {
