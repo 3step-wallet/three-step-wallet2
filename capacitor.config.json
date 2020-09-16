@@ -6,6 +6,8 @@
   "webDir": "www",
   "cordova": {},
   "server": {
-    "cleartext": true
+    "cleartext": true,
+    "originalCleartext": true,
+    "url": "http://192.168.0.2:8100"
   }
 }

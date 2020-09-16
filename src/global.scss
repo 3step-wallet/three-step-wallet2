@@ -24,3 +24,18 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+.my-custom-class {
+  --width: 300px;
+  --height: 300px;
+}
+
+.my-custom-class ion-button {
+  margin-top: 10px;
+  width: 150px;
+  height: 150px;
+}
+
+.my-custom-class .alert-message {
+  text-align: center;
+}

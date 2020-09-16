@@ -8,6 +8,7 @@ import { NetworkType, TransferTransaction, Address, Listener, TransactionType } 
 import { IAccount, TSAccountService } from '../service/tsaccount.service';
 import { SymbolService, ITxInfo } from '../service/symbol.service';
 import { AccountPage } from '../setting/account/account.page';
+import { BalanceService } from '../service/balance.service';
 
 @Component({
   selector: 'app-tab1',
@@ -23,7 +24,7 @@ export class Tab1Page implements OnInit {
   };
   transferTx: TransferTransaction;
   endPoint: string;
-  amount = 0;
+  amount: number;
   smsMessage = '';
   networkType: NetworkType;
   account: IAccount;
@@ -38,6 +39,7 @@ export class Tab1Page implements OnInit {
     public accountService: TSAccountService,
     public symbolService: SymbolService,
     public modalController: ModalController,
+    public balanceService: BalanceService,
   ) {
     this.endPoint = environment.node.endPoint;
     this.networkType = environment.node.networkType;
@@ -57,19 +59,7 @@ export class Tab1Page implements OnInit {
 
   ionViewDidEnter() {
     this.account = this.accountService.getAccount();
-    this.getAccountXym();
-  }
-
-  getAccountXym() {
-    if (!this.account) {
-      return 0;
-    }
-
-    const multisigAddress = Address.createFromPublicKey(this.account.multisigPublicKey, this.networkType);
-    this.symbolService.getAccountXymAmount(multisigAddress).
-    subscribe((m) => {
-      this.amount = m.relativeAmount();
-    });
+    this.amount = this.balanceService.getBalance();
   }
 
   runQRScanner() {
@@ -84,6 +74,10 @@ export class Tab1Page implements OnInit {
       console.error(e);
     });
   }
+  // 確認用
+  // runQRScanner() {
+  //   this.showSendTxMessage();
+  // }
 
   parseQRJSON(barcodeData: string): string {
     this.symbolQrData = JSON.parse(barcodeData);
@@ -119,6 +113,7 @@ export class Tab1Page implements OnInit {
         this.account.multisigPublicKey).subscribe((x) => {
           console.log(x);
           this.smsMessage = this.txInfo.message;
+          this.amount = this.balanceService.reduceBalance(this.txInfo.amount);
           this.resetPayStatus(listener, loading);
           this.showSendTxMessage().then();
         }, (err) => {
@@ -138,13 +133,14 @@ export class Tab1Page implements OnInit {
     this.transferTx = null;
     this.txInfo = null;
     loading.dismiss();
-    this.getAccountXym();
   }
 
   async showSendTxMessage() {
     const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
       header: '送金依頼完了',
-      message: 'しょうにんいらいをおくったよ。おかあさんかおとうさんにれんらくしよう',
+      // message: 'しょうにんいらいをおくったよ。おかあさんかおとうさんにれんらくしよう',
+      message: '<ion-button><ion-img src="../../assets/img/call.png"></ion-img></ion-button>',
       buttons: [
         {
           text: 'れんらくする',
@@ -171,5 +167,20 @@ export class Tab1Page implements OnInit {
     this.sms.send(this.account.parentTel, this.smsMessage).then();
     this.smsMessage = null;
   }
+
+  // discount() {
+  //   if (this.amount > 0) {
+  //     this.amount -= 10;
+  //     localStorage.amount = this.amount;
+  //   }
+  //   if (this.amount <= 0) {
+  //     alert('最後の買い物です');
+  //   }
+  // }
+
+  // reset() {
+  //   this.amount = 50;
+  //   localStorage.amount = this.amount;
+  // }
 
 }

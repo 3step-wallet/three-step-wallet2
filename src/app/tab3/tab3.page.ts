@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { AccountPage } from '../setting/account/account.page';
+import { BalanceService } from '../service/balance.service';
 
 @Component({
   selector: 'app-tab3',
@@ -8,9 +9,9 @@ import { AccountPage } from '../setting/account/account.page';
   styleUrls: ['tab3.page.scss']
 })
 export class Tab3Page {
-
   constructor(
     public modalController: ModalController,
+    public balanceService: BalanceService,
   ) {}
 
   async openAccountSetting() {
@@ -18,6 +19,10 @@ export class Tab3Page {
       component: AccountPage,
     });
     modal.present();
+  }
+
+  reset() {
+    this.balanceService.resetBalance();
   }
 
 }

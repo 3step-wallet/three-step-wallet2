@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { IAccount, TSAccountService } from '../../service/tsaccount.service';
 import { SymbolService } from 'src/app/service/symbol.service';
+import { BalanceService } from 'src/app/service/balance.service';
 
 @Component({
   selector: 'app-account',
@@ -9,12 +10,12 @@ import { SymbolService } from 'src/app/service/symbol.service';
   styleUrls: ['./account.page.scss'],
 })
 export class AccountPage implements OnInit {
-
   constructor(
     public accountService: TSAccountService,
     public symbolService: SymbolService,
     public modalController: ModalController,
     public toastController: ToastController,
+    public balanceService: BalanceService,
   ) { }
 
   account: IAccount = {
@@ -52,6 +53,7 @@ export class AccountPage implements OnInit {
     if (isValid) {
       this.accountService.saveAccount(this.account);
       this.dismissModalController();
+      this.balanceService.resetBalance();
     } else {
       await this.showInvalidAccountSettingToast();
     }
